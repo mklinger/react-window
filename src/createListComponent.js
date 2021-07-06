@@ -61,6 +61,8 @@ export type Props<T> = {|
   direction: Direction,
   height: number | string,
   initialScrollOffset?: number,
+  initialScrollItem?: number,
+  initialScrollItemAlign: string,
   innerRef?: any,
   innerElementType?: string | React$AbstractComponent<InnerProps, any>,
   innerTagName?: string, // deprecated
@@ -169,6 +171,7 @@ export default function createListComponent({
       overscanCount: 2,
       useIsScrolling: false,
       scrollBehavior: 'auto',
+      initialScrollItemAlign: 'auto',
     };
 
     state: State = {
@@ -178,7 +181,15 @@ export default function createListComponent({
       scrollOffset:
         typeof this.props.initialScrollOffset === 'number'
           ? this.props.initialScrollOffset
-          : 0,
+          : typeof this.props.initialScrollItem === 'number'
+            ? getOffsetForIndexAndAlignment(
+                this.props,
+                this.props.initialScrollItem,
+                this.props.initialScrollItemAlign,
+                0,
+                this._instanceProps
+              )
+            : 0,
       scrollUpdateWasRequested: false,
     };
 
@@ -232,7 +243,7 @@ export default function createListComponent({
     }
 
     componentDidMount() {
-      const { direction, initialScrollOffset, layout } = this.props;
+      const { direction, initialScrollOffset, initialScrollItem, initialScrollItemAlign, layout } = this.props;
 
       if (typeof initialScrollOffset === 'number' && this._outerRef != null) {
         const outerRef = ((this._outerRef: any): HTMLElement);
@@ -241,6 +252,25 @@ export default function createListComponent({
           outerRef.scrollLeft = initialScrollOffset;
         } else {
           outerRef.scrollTop = initialScrollOffset;
+        }
+      } else if (
+        typeof initialScrollItem === 'number' &&
+        this._outerRef != null
+      ) {
+        const outerRef = ((this._outerRef: any): HTMLElement);
+        const scrollOffset = getOffsetForIndexAndAlignment(
+          this.props,
+          initialScrollItem,
+          initialScrollItemAlign,
+          0,
+          this._instanceProps
+        );
+
+        // TODO Deprecate direction "horizontal"
+        if (direction === 'horizontal' || layout === 'horizontal') {
+          outerRef.scrollLeft = scrollOffset;
+        } else {
+          outerRef.scrollTop = scrollOffset;
         }
       }
 
