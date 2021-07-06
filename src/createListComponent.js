@@ -77,6 +77,7 @@ export type Props<T> = {|
   overscanCount: number,
   style?: Object,
   useIsScrolling: boolean,
+  scrollBehavior: string,
   width: number | string,
 |};
 
@@ -167,6 +168,7 @@ export default function createListComponent({
       layout: 'vertical',
       overscanCount: 2,
       useIsScrolling: false,
+      scrollBehavior: 'auto',
     };
 
     state: State = {
@@ -246,7 +248,7 @@ export default function createListComponent({
     }
 
     componentDidUpdate() {
-      const { direction, layout } = this.props;
+      const { direction, layout, scrollBehavior } = this.props;
       const { scrollOffset, scrollUpdateWasRequested } = this.state;
 
       if (scrollUpdateWasRequested && this._outerRef != null) {
@@ -260,21 +262,36 @@ export default function createListComponent({
             // So we need to determine which browser behavior we're dealing with, and mimic it.
             switch (getRTLOffsetType()) {
               case 'negative':
-                outerRef.scrollLeft = -scrollOffset;
+                outerRef.scrollTo({
+                  left: -scrollOffset,
+                  behavior: scrollBehavior,
+                });
                 break;
               case 'positive-ascending':
-                outerRef.scrollLeft = scrollOffset;
+                outerRef.scrollTo({
+                  left: scrollOffset,
+                  behavior: scrollBehavior,
+                });
                 break;
               default:
                 const { clientWidth, scrollWidth } = outerRef;
-                outerRef.scrollLeft = scrollWidth - clientWidth - scrollOffset;
+                outerRef.scrollTo({
+                  left: scrollWidth - clientWidth - scrollOffset,
+                  behavior: scrollBehavior,
+                });
                 break;
             }
           } else {
-            outerRef.scrollLeft = scrollOffset;
+            outerRef.scrollTo({
+              left: scrollOffset,
+              behavior: scrollBehavior,
+            });
           }
         } else {
-          outerRef.scrollTop = scrollOffset;
+          outerRef.scrollTo({
+            top: scrollOffset,
+            behavior: scrollBehavior,
+          });
         }
       }
 
