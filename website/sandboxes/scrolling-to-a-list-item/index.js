@@ -23,6 +23,9 @@ class Example extends Component {
           <button className="ExampleButton" onClick={this.scrollToRow250Smart}>
             Scroll to row 250 (align: smart)
           </button>
+          <button className="ExampleButton" onClick={this.scrollToRow3Center}>
+            Scroll to row 3 (align: center)
+          </button>
           <button className="ExampleButton" onClick={this.scrollToRow300Center}>
             Scroll to row 300 (align: center)
           </button>
@@ -46,6 +49,9 @@ class Example extends Component {
   };
   scrollToRow250Smart = () => {
     this.listRef.current.scrollToItem(250, 'smart');
+  };
+  scrollToRow3Center = () => {
+    this.listRef.current.scrollToItem(3, 'center');
   };
   scrollToRow300Center = () => {
     this.listRef.current.scrollToItem(300, 'center');
