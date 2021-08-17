@@ -191,6 +191,7 @@ export default function createListComponent({
               )
             : 0,
       scrollUpdateWasRequested: false,
+      scrollBehavior: this.props.scrollBehavior,
     };
 
     // Always use explicit constructor for React components.
@@ -209,7 +210,7 @@ export default function createListComponent({
       return null;
     }
 
-    scrollTo(scrollOffset: number): void {
+    scrollTo(scrollOffset: number, scrollBehavior: string = null): void {
       scrollOffset = Math.max(0, scrollOffset);
 
       this.setState(prevState => {
@@ -221,11 +222,12 @@ export default function createListComponent({
             prevState.scrollOffset < scrollOffset ? 'forward' : 'backward',
           scrollOffset: scrollOffset,
           scrollUpdateWasRequested: true,
+          scrollBehavior: scrollBehavior || this.props.scrollBehavior,
         };
       }, this._resetIsScrollingDebounced);
     }
 
-    scrollToItem(index: number, align: ScrollToAlign = 'auto'): void {
+    scrollToItem(index: number, align: ScrollToAlign = 'auto', scrollBehavior: string = null): void {
       const { itemCount } = this.props;
       const { scrollOffset } = this.state;
 
@@ -238,7 +240,8 @@ export default function createListComponent({
           align,
           scrollOffset,
           this._instanceProps
-        )
+        ),
+        scrollBehavior
       );
     }
 
@@ -278,10 +281,12 @@ export default function createListComponent({
     }
 
     componentDidUpdate() {
-      const { direction, layout, scrollBehavior } = this.props;
-      const { scrollOffset, scrollUpdateWasRequested } = this.state;
+      const { direction, layout } = this.props;
+      const { scrollOffset, scrollUpdateWasRequested, scrollBehavior } = this.state;
 
       if (scrollUpdateWasRequested && this._outerRef != null) {
+        console.log('Scrolling with scrollBehavior', scrollBehavior);
+
         const outerRef = ((this._outerRef: any): HTMLElement);
 
         // TODO Deprecate direction "horizontal"
